@@ -1,5 +1,5 @@
-if [ -s ~/z.lua/z.lua ]; then
-  eval "$(lua ~/z.lua/z.lua --init bash enhanced once)"
+if [ -s ~/.shell_exts/z.lua/z.lua ]; then
+  eval "$(lua ~/.shell_exts/z.lua/z.lua --init bash enhanced once)"
 fi
 
 alias l='ls -hal'
