@@ -2,6 +2,11 @@ if [ -s ~/.shell_exts/z.lua/z.lua ]; then
   eval "$(lua ~/.shell_exts/z.lua/z.lua --init bash enhanced once)"
 fi
 
+export PATH=$PATH:~/.shell_exts/
+
+# for MacOS - scan and block Spotlight scanning node_modules
+alias fix-spotlight="find . -type d -path './.*' -prune -o -path './Pictures*' -prune -o -path './Library*' -prune -o -path '*node_modules/*' -prune -o -type d -name 'node_modules' -exec touch '{}/.metadata_never_index' \; -print"
+
 alias l='ls -hal'
 alias nr='npm run'
 alias ..='cd ..'
