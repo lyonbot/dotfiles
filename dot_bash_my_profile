@@ -2,164 +2,18 @@ if [ -s ~/.shell_exts/z.lua/z.lua ]; then
   eval "$(lua ~/.shell_exts/z.lua/z.lua --init bash enhanced once)"
 fi
 
-export PATH=$PATH:~/.shell_exts/
-
 # for MacOS - scan and block Spotlight scanning node_modules
 alias fix-spotlight="find . -type d -path './.*' -prune -o -path './Pictures*' -prune -o -path './Library*' -prune -o -path '*node_modules/*' -prune -o -type d -name 'node_modules' -exec touch '{}/.metadata_never_index' \; -print"
 
-alias l='ls -hal'
-alias nr='npm run'
-alias ..='cd ..'
+source ~/.shell_exts/shell/alias.sh
+source ~/.shell_exts/shell/tools.sh
 
-alias gpl='git pull'
-alias gpu='git push'
-alias gf='git fetch'
-alias gc='git commit'
-alias gco='git switch'  # or checkout?
-alias gcamend='git commit --amend -a'
-alias gs='git stash push'
-alias gsp='git stash pop'
-
-alias gmom='gmo m'   # main or master
-gmo() {
-  # git fetch && merge <branch> 
-  # -- branch defaults to current.
-  # -- use m as "master" or "main"
-  
-  branch=${1:-$(git rev-parse --abbrev-ref HEAD)}
-  if [ "$branch" == "m" ]; then
-    if git ls-remote --exit-code --heads origin main; then
-      branch=main
-    else
-      branch=master
-    fi
-  fi
-
-  git fetch origin && git merge "origin/$branch"
-}
-
-
-killport() { lsof -i tcp:"$*" | awk 'NR!=1 {print $2}' | xargs kill -9 ;}
-gif() {
-  local src="$1"
-  local out="${src%.*}.gif"
-  local fps=25
-  local speedRatio=1
-  local width="-1"
-  local height="-1"
-
-  local USAGE="Usage: gif <src> [-s speedRatio] [-f fps] [-w width] [-h height] [-o output]"
-  if [ ! -f "$src" ]; then
-    echo "File not found: $src"
-    echo $USAGE
-    return
-  fi
-
-  shift
-  while [ -n "$1" ]; do
-    case "$1" in
-      -s) speedRatio="$2"; shift 2;;
-      -f) fps="$2"; shift 2;;
-      -w) width="$2"; shift 2;;
-      -h) height="$2"; shift 2;;
-      -o) out="$2"; shift 2;;
-      *) echo $USAGE; return;;
-    esac
-  done
-
-  if [ "$width" == "-1" ] && [ "$height" == "-1" ]; then
-    width="iw"
-    height="ih"
-  fi
-
-  ffmpeg -i "$src" \
-    -filter_complex "[0:v] setpts=PTS/$speedRatio,fps=$fps,scale=w=$width:h=$height,split [a][b];[a] palettegen=stats_mode=single [p];[b][p] paletteuse=new=1" \
-    -loop 0 \
-    -y "$out"
-}
-
+export PATH=$PATH:~/.shell_exts/bin/
 
 export PUB_HOSTED_URL=https://pub.flutter-io.cn
 export FLUTTER_STORAGE_BASE_URL=https://storage.flutter-io.cn
 
-
-
-
 export PS1='`if [ $? = 0 ];then echo "\[\033[1;32m\]✔";else echo "\[\033[1;31m\]✘";fi` \[\033[1;30m\]\u \[\033[1;34m\]\w\[\033[0;35m\]$(__git_ps1 2>/dev/null) \[\033[1;31m\]>\[\033[0m\] '
 
-
-
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
-
-###-begin-npm-completion-###
-#
-# npm command completion script
-#
-# Installation: npm completion >> ~/.bashrc  (or ~/.zshrc)
-# Or, maybe: npm completion > /usr/local/etc/bash_completion.d/npm
-#
-
-if type complete &>/dev/null; then
-  _npm_completion () {
-    local words cword
-    if type _get_comp_words_by_ref &>/dev/null; then
-      _get_comp_words_by_ref -n = -n @ -n : -w words -i cword
-    else
-      cword="$COMP_CWORD"
-      words=("${COMP_WORDS[@]}")
-    fi
-
-    local si="$IFS"
-    if ! IFS=$'\n' COMPREPLY=($(COMP_CWORD="$cword" \
-                           COMP_LINE="$COMP_LINE" \
-                           COMP_POINT="$COMP_POINT" \
-                           npm completion -- "${words[@]}" \
-                           2>/dev/null)); then
-      local ret=$?
-      IFS="$si"
-      return $ret
-    fi
-    IFS="$si"
-    if type __ltrim_colon_completions &>/dev/null; then
-      __ltrim_colon_completions "${words[cword]}"
-    fi
-  }
-  complete -o default -F _npm_completion npm
-elif type compdef &>/dev/null; then
-  _npm_completion() {
-    local si=$IFS
-    compadd -- $(COMP_CWORD=$((CURRENT-1)) \
-                 COMP_LINE=$BUFFER \
-                 COMP_POINT=0 \
-                 npm completion -- "${words[@]}" \
-                 2>/dev/null)
-    IFS=$si
-  }
-  compdef _npm_completion npm
-elif type compctl &>/dev/null; then
-  _npm_completion () {
-    local cword line point words si
-    read -Ac words
-    read -cn cword
-    let cword-=1
-    read -l line
-    read -ln point
-    si="$IFS"
-    if ! IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                       COMP_LINE="$line" \
-                       COMP_POINT="$point" \
-                       npm completion -- "${words[@]}" \
-                       2>/dev/null)); then
-
-      local ret=$?
-      IFS="$si"
-      return $ret
-    fi
-    IFS="$si"
-  }
-  compctl -K _npm_completion npm
-fi
-###-end-npm-completion-###
-
-
-
+source ~/.shell_exts/shell/npm_completion.sh
