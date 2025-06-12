@@ -3,6 +3,30 @@ killport() {
   lsof -i tcp:"$*" | awk 'NR!=1 {print $2}' | xargs kill -9
 }
 
+kill_node_modules() {
+  PACKAGE_MANAGER="pnpm"
+  if [ -f "yarn.lock" ]; then
+    rm yarn.lock
+    PACKAGE_MANAGER="yarn"
+  fi
+  if [ -f "package-lock.json" ]; then
+    rm package-lock.json
+    PACKAGE_MANAGER="npm"
+  fi
+  if [ -f "pnpm-lock.yaml" ]; then
+    rm pnpm-lock.yaml
+    PACKAGE_MANAGER="pnpm"
+  fi
+
+  echo "Package manager: $PACKAGE_MANAGER"
+  echo "Deleting node_modules..."
+
+  tempDir="../node_modules_to_delete_$(date +%s)"
+  mv node_modules "$tempDir" && nohup rm -rf "$tempDir" &
+
+  $PACKAGE_MANAGER install
+}
+
 gif() {
   local src="$1"
   local out="${src%.*}.gif"
