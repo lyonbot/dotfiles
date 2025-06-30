@@ -53,6 +53,7 @@ complete-alias __git_wrap__git_main gco git switch
 complete-alias __git_wrap__git_main gcamend git commit --amend -a
 complete-alias __git_wrap__git_main gs git stash push
 complete-alias __git_wrap__git_main gsp git stash pop
+complete-alias __git_wrap__git_main gm git merge
 alias gmom='gmo m'   # main or master
 gmo() {
   # git fetch && merge <branch> 
