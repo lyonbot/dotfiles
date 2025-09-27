@@ -1,6 +1,6 @@
 dequarant() {
   local F="$1"
-  xattr -r -d com.apple.quarantine $F
+  xattr -r -d com.apple.quarantine "$F"
 }
 
 killport() {
