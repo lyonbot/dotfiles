@@ -59,7 +59,7 @@ gmo() {
   # git fetch && merge <branch> 
   # -- branch defaults to current.
   # -- use m as "master" or "main"
-  branch=${1:-$(git rev-parse --abbrev-ref HEAD)}
+  local branch=${1:-$(git rev-parse --abbrev-ref HEAD)}
   if [ "$branch" == "m" ]; then
     if git ls-remote --exit-code --heads origin main; then
       branch=main
@@ -69,6 +69,10 @@ gmo() {
   fi
 
   git fetch origin && git merge "origin/$branch"
+}
+greset-origin-hard() {
+  local branch=$(git rev-parse --abbrev-ref HEAD)
+  git reset --hard origin/$branch
 }
 
 unset -f make-completion-wrapper
