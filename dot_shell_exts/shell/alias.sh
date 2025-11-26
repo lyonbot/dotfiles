@@ -1,59 +1,41 @@
-function make-completion-wrapper () {
-  local function_name="$2"
-  local arg_count=$(($#-3))
-  local comp_function_name="$1"
-  shift 2
-  local function="
-    function $function_name {
-      ((COMP_CWORD+=$arg_count))
-      # Quotes here are important
-      COMP_WORDS=( "$@" \"\${COMP_WORDS[@]:1}\" )
-      "$comp_function_name"
-      return 0
-    }"
-  eval "$function"
-  # echo $function_name
-  # echo "$function"
-}
-
-function complete-alias  {
-  # uses make-completion-wrapper: https://unix.stackexchange.com/a/4220/50978
-  # example usage
-  # complete-alias _pass pshow pass show
-  # complete-alias _pass pgen pass generate
-
-  local EXISTING_COMPLETION_FN=${1} && shift
-  local ALIAS=${1} && shift
-  local AUTOGEN_COMPLETION_FN="__autogen_completion_${ALIAS}"
-
-  local ORIGINAL_COMMAND="${*}"
-  local ARGS_FOR_COMPLETION_FN=""   # original command without -args
-  while [ $# -gt 0 ]; do
-    if ! [ "$1" == "-" ]; then
-      ARGS_FOR_COMPLETION_FN="$ARGS_FOR_COMPLETION_FN $1"
-    fi
-    shift
-  done
-
-  make-completion-wrapper ${EXISTING_COMPLETION_FN} ${AUTOGEN_COMPLETION_FN} ${ARGS_FOR_COMPLETION_FN}
-  complete -F ${AUTOGEN_COMPLETION_FN} ${ALIAS}
-  alias ${ALIAS}="$ORIGINAL_COMMAND"
-}
+source ~/.shell_exts/shell/complete_alias
 
 alias l='ls -hal'
 alias ..='cd ..'
 
-complete-alias _npm_completion nr npm run
+alias nr='npm run'
+complete -F _complete_alias nr
 
-complete-alias __git_wrap__git_main gpl git pull
-complete-alias __git_wrap__git_main gpu git push
-complete-alias __git_wrap__git_main gf git fetch
-complete-alias __git_wrap__git_main gc git commit
-complete-alias __git_wrap__git_main gco git switch
-complete-alias __git_wrap__git_main gcamend git commit --amend -a
-complete-alias __git_wrap__git_main gs git stash push
-complete-alias __git_wrap__git_main gsp git stash pop
-complete-alias __git_wrap__git_main gm git merge
+alias prm='gh pr merge -m'
+alias prma='gh pr merge -m --auto'
+alias prnew='gh pr new'
+alias prvi='gh pr view --web'
+alias prchk='gh pr checks --watch'
+complete -F _complete_alias prm
+complete -F _complete_alias prma
+complete -F _complete_alias prnew
+complete -F _complete_alias prvi
+complete -F _complete_alias prchk
+
+alias gpl='git pull'
+alias gpu='git push'
+alias gf='git fetch'
+alias gc='git commit'
+alias gco='git switch'
+alias gcamend='git commit --amend -a'
+alias gs='git stash push'
+alias gsp='git stash pop'
+alias gm='git merge'
+complete -F _complete_alias gpl
+complete -F _complete_alias gpu
+complete -F _complete_alias gf
+complete -F _complete_alias gc
+complete -F _complete_alias gco
+complete -F _complete_alias gcamend
+complete -F _complete_alias gs
+complete -F _complete_alias gsp
+complete -F _complete_alias gm
+
 alias gmom='gmo m'   # main or master
 gmo() {
   # git fetch && merge <branch> 
@@ -76,5 +58,4 @@ greset-origin-hard() {
   git reset --hard origin/$branch
 }
 
-unset -f make-completion-wrapper
 unset -f complete-alias
