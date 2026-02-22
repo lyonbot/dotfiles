@@ -2,6 +2,7 @@ source ~/.shell_exts/shell/complete_alias
 
 alias l='ls -hal'
 alias ..='cd ..'
+alias claude-yolo='claude --dangerously-skip-permissions'
 
 alias nr='npm run'
 complete -F _complete_alias nr
