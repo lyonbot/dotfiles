@@ -26,7 +26,8 @@ kill_node_modules() {
   echo "Deleting node_modules..."
 
   tempDir="../node_modules_to_delete_$(date +%s)"
-  mv node_modules "$tempDir" && nohup rm -rf "$tempDir" &
+  mv node_modules "$tempDir"
+  nohup rm -rf "$tempDir" &
 
   $PACKAGE_MANAGER install
 }
@@ -34,7 +35,7 @@ kill_node_modules() {
 gif() {
   local src="$1"
   local out="${src%.*}.gif"
-  local fps=25
+  local fps=20
   local speedRatio=1
   local width="-1"
   local height="-1"
@@ -64,7 +65,7 @@ gif() {
   fi
 
   ffmpeg -i "$src" \
-    -filter_complex "[0:v] setpts=PTS/$speedRatio,fps=$fps,scale=w=$width:h=$height,split [a][b];[a] palettegen=stats_mode=single [p];[b][p] paletteuse=new=1" \
+    -filter_complex "[0:v] setpts=PTS/$speedRatio,fps=$fps,scale=w=$width:h=$height,split [a][b];[a] palettegen [p];[b][p] paletteuse=new=1" \
     -loop 0 \
     -y "$out"
 }

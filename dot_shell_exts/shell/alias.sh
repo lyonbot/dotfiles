@@ -11,6 +11,7 @@ alias prm='gh pr merge -m'
 alias prma='gh pr merge -m --auto'
 alias prnew='gh pr new'
 alias prvi='gh pr view --web'
+alias prst='gh pr status'
 alias prchk='gh pr checks --watch'
 complete -F _complete_alias prm
 complete -F _complete_alias prma
