@@ -20,7 +20,29 @@ cd "$WORKTREE_DIR"
 
 if [ -f "pnpm-lock.yaml" ]; then
   echo "Detected pnpm — running pnpm install"
-  pnpm install
+
+  copy_node_modules_from_root() {
+    local src_root="$1" dst_root="$2"
+    find "$src_root" -name node_modules -type d \
+      -not -path '*/node_modules/*' \
+      -not -path '*/.worktree/*' \
+      -not -path '*/.local/*' \
+      -not -path '*/.git/*' \
+    | while IFS= read -r src; do
+        rel="${src#$src_root/}"
+        mkdir -p "$dst_root/$(dirname "$rel")"
+        cp -Rc "$src" "$dst_root/$rel"
+      done
+  }
+  if true # cmp -s "$REPO_ROOT/pnpm-lock.yaml" "$WORKTREE_DIR/pnpm-lock.yaml" \
+    && [ -d "$REPO_ROOT/node_modules/.pnpm" ]; then
+    echo "cloning all node_modules"
+    copy_node_modules_from_root "$REPO_ROOT" "$WORKTREE_DIR"
+  fi
+
+  echo "running pnpm install --prefer-offline --frozen-lockfile --ignore-scripts"
+  pnpm install --prefer-offline --frozen-lockfile --ignore-scripts
+
 elif [ -f "yarn.lock" ]; then
   echo "Detected yarn — running yarn install"
   yarn install
@@ -44,6 +66,7 @@ fi
 ENV_COUNT=0
 for ENV_FILE in "$REPO_ROOT"/.env "$REPO_ROOT"/.env.*; do
   # Skip glob patterns that didn't expand (no match)
+  [ ! -f "$WORKTREE_DIR/$BASENAME" ] || continue
   [ -f "$ENV_FILE" ] || continue
   BASENAME="$(basename "$ENV_FILE")"
   ln -sf "$ENV_FILE" "$WORKTREE_DIR/$BASENAME"

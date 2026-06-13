@@ -1,12 +1,30 @@
 {
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  },
+  "includeCoAuthoredBy": false,
   "permissions": {
     "defaultMode": "bypassPermissions"
   },
   "model": "opusplan",
   "enabledPlugins": {
     "document-skills@anthropic-agent-skills": true,
-    "example-skills@anthropic-agent-skills": true,
-    "frontend-design@claude-plugins-official": false
+    "example-skills@anthropic-agent-skills": false,
+    "frontend-design@claude-plugins-official": false,
+    "gopls-lsp@claude-plugins-official": true,
+    "skill-creator@claude-plugins-official": true,
+    "waza@waza": true
   },
-  "skipDangerousModePermissionPrompt": true
+  "extraKnownMarketplaces": {
+    "waza": {
+      "source": {
+        "source": "github",
+        "repo": "tw93/Waza"
+      }
+    }
+  },
+  "effortLevel": "medium",
+  "skipDangerousModePermissionPrompt": true,
+  "editorMode": "vim"
 }

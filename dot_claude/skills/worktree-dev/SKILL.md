@@ -35,7 +35,7 @@ Show the proposed branch name to the user and confirm before proceeding.
 From the **repo root**, run:
 
 ```bash
-bash /Users/yon/.claude/my-skills/worktree-dev/scripts/setup_worktree.sh <branch-name>
+bash <skill-dir>/scripts/setup_worktree.sh "<branch-name>"
 ```
 
 The script will:
@@ -44,15 +44,7 @@ The script will:
 3. Search for `.env` and `.env.*` files at the repo root and symlink any found into the worktree
 4. Print `Branch <name> okay under <path>`
 
-Supported package managers (auto-detected by lockfile):
-| Lockfile | Command |
-|---|---|
-| `pnpm-lock.yaml` | `pnpm install` |
-| `yarn.lock` | `yarn install` |
-| `package-lock.json` | `npm install` |
-| `Pipfile.lock` | `pipenv install` |
-| `poetry.lock` | `poetry install` |
-| `requirements.txt` | `pip install -r requirements.txt` |
+Supported package managers (auto-detected by lockfile): pnpm, yarn, npm, pipenv, poetry, pip.
 
 ### 3. Report to user
 
