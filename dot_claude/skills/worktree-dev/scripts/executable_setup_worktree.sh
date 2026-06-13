@@ -23,6 +23,12 @@ if [ -f "pnpm-lock.yaml" ]; then
 
   copy_node_modules_from_root() {
     local src_root="$1" dst_root="$2"
+    # -c (clonefile) is macOS-only; use --reflink=auto on Linux for CoW when supported
+    if [[ "$(uname)" == "Darwin" ]]; then
+      local cp_flags="-Rc"
+    else
+      local cp_flags="-r --reflink=auto"
+    fi
     find "$src_root" -name node_modules -type d \
       -not -path '*/node_modules/*' \
       -not -path '*/.worktree/*' \
@@ -31,7 +37,8 @@ if [ -f "pnpm-lock.yaml" ]; then
     | while IFS= read -r src; do
         rel="${src#$src_root/}"
         mkdir -p "$dst_root/$(dirname "$rel")"
-        cp -Rc "$src" "$dst_root/$rel"
+        # shellcheck disable=SC2086
+        cp $cp_flags "$src" "$dst_root/$rel"
       done
   }
   if true # cmp -s "$REPO_ROOT/pnpm-lock.yaml" "$WORKTREE_DIR/pnpm-lock.yaml" \
@@ -65,10 +72,10 @@ fi
 # 3. Find and symlink all .env* files from repo root
 ENV_COUNT=0
 for ENV_FILE in "$REPO_ROOT"/.env "$REPO_ROOT"/.env.*; do
-  # Skip glob patterns that didn't expand (no match)
-  [ ! -f "$WORKTREE_DIR/$BASENAME" ] || continue
   [ -f "$ENV_FILE" ] || continue
   BASENAME="$(basename "$ENV_FILE")"
+  # Skip if symlink/file already exists in the worktree
+  [ ! -e "$WORKTREE_DIR/$BASENAME" ] || continue
   ln -sf "$ENV_FILE" "$WORKTREE_DIR/$BASENAME"
   echo "Linked $BASENAME"
   ENV_COUNT=$((ENV_COUNT + 1))
